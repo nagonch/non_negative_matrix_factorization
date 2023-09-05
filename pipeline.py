@@ -2,6 +2,23 @@ import os
 import numpy as np
 from PIL import Image
 from numpy import sqrt
+import matplotlib.pyplot as plt
+
+
+def add_occlusion_block(image_array, b=10):
+    return image_array
+
+
+def add_salt_and_pepper_noise(image_array, ratio=0.025):
+    for corrupted_value in [0, 255]:
+        noise = np.random.uniform(
+            low=0.0,
+            high=1.0,
+            size=(image_array.shape[0], image_array.shape[1]),
+        )
+        mask = (noise <= ratio).astype(np.float32)
+        image_array = np.where(mask, corrupted_value, image_array)
+    return image_array
 
 
 def load_data(root="data/CroppedYaleB", reduce=4):
@@ -34,10 +51,11 @@ def load_data(root="data/CroppedYaleB", reduce=4):
             # reduce computation complexity.
             img = img.resize([s // reduce for s in img.size])
 
-            # TODO: preprocessing.
-
             # convert image to numpy array.
-            img = np.asarray(img).reshape((-1, 1))
+            img = np.asarray(img)
+            img = add_salt_and_pepper_noise(img)
+            plt.imshow(img)
+            plt.show()
 
             # collect data and label.
             images.append(img)
@@ -51,4 +69,4 @@ def load_data(root="data/CroppedYaleB", reduce=4):
 
 
 if __name__ == "__main__":
-    pass
+    load_data()
