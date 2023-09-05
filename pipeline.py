@@ -27,7 +27,7 @@ def add_salt_and_pepper_noise(image_array, ratio=0.025):
     return image_array
 
 
-def load_data(root="data/CroppedYaleB", reduce=4):
+def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
     """
     Load ORL (or Extended YaleB) dataset to numpy array.
 
@@ -59,7 +59,10 @@ def load_data(root="data/CroppedYaleB", reduce=4):
 
             # convert image to numpy array.
             img = np.asarray(img)
-            img = add_occlusion_block(img)
+            if corruption_type == "occlusion":
+                img = add_occlusion_block(img)
+            elif corruption_type == "salt_and_pepper":
+                img = add_salt_and_pepper_noise(img)
             plt.imshow(img)
             plt.show()
 
@@ -75,4 +78,4 @@ def load_data(root="data/CroppedYaleB", reduce=4):
 
 
 if __name__ == "__main__":
-    load_data()
+    load_data(corruption_type="dsd")
