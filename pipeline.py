@@ -6,7 +6,13 @@ import matplotlib.pyplot as plt
 
 
 def add_occlusion_block(image_array, b=10):
-    return image_array
+    block_index_i = np.random.randint(0, image_array.shape[0] - (b + 1))
+    block_index_j = np.random.randint(0, image_array.shape[1] - (b + 1))
+    result = np.copy(image_array)
+    result[
+        block_index_i : block_index_i + b, block_index_j : block_index_j + b
+    ] = 255 * np.ones((b, b))
+    return result
 
 
 def add_salt_and_pepper_noise(image_array, ratio=0.025):
@@ -53,7 +59,7 @@ def load_data(root="data/CroppedYaleB", reduce=4):
 
             # convert image to numpy array.
             img = np.asarray(img)
-            img = add_salt_and_pepper_noise(img)
+            img = add_occlusion_block(img)
             plt.imshow(img)
             plt.show()
 
