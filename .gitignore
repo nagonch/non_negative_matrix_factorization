@@ -1,0 +1,6 @@
+*.pgm
+*.info
+data
+LaTeX-template
+venv
+.vscode

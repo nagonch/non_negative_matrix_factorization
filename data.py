@@ -1,8 +1,6 @@
 import os
 import numpy as np
 from PIL import Image
-from numpy import sqrt
-import matplotlib.pyplot as plt
 
 
 def add_occlusion_block(image_array, b=10):
@@ -63,8 +61,6 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
                 img = add_occlusion_block(img)
             elif corruption_type == "salt_and_pepper":
                 img = add_salt_and_pepper_noise(img)
-            plt.imshow(img)
-            plt.show()
 
             # collect data and label.
             images.append(img)
@@ -78,4 +74,4 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
 
 
 if __name__ == "__main__":
-    load_data(corruption_type="dsd")
+    pass
