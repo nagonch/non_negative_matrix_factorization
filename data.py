@@ -67,11 +67,16 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
             labels.append(i)
 
     # concate all images and labels.
-    images = np.concatenate(images, axis=1)
+    images = np.array(images)
+    images = images.reshape(-1, images.shape[1] * images.shape[2])
     labels = np.array(labels)
 
     return images, labels
 
 
 if __name__ == "__main__":
-    pass
+    images, labels = load_data(
+        root="data/ORL", corruption_type="salt_and_pepper"
+    )
+
+    print(images.shape, labels.shape)
