@@ -2,14 +2,16 @@ import numpy as np
 import numpy.typing as npt
 from data import load_data
 from tqdm import tqdm
-
-
-"""Lee, D. D., & Seung, H. S. (1999)
-Learning the parts of objects by non-negative matrix factorization
-Nature, 401(6755), 788-791"""
+from matplotlib import pyplot as plt
 
 
 class LeeSeungNMF:
+    """
+    Lee, D. D., & Seung, H. S. (1999)
+    Learning the parts of objects by non-negative matrix factorization
+    Nature, 401(6755), 788-791
+    """
+
     def __init__(
         self,
         latent_space_size: int,
@@ -41,8 +43,6 @@ class LeeSeungNMF:
 
 
 if __name__ == "__main__":
-    from matplotlib import pyplot as plt
-
     images, labels = load_data(root="data/ORL", corruption_type=None)
     K = 2
     alg = LeeSeungNMF(K)
