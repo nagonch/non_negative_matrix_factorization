@@ -4,6 +4,11 @@ from data import load_data
 from tqdm import tqdm
 
 
+"""Lee, D. D., & Seung, H. S. (1999)
+Learning the parts of objects by non-negative matrix factorization
+Nature, 401(6755), 788-791"""
+
+
 class LeeSeungNMF:
     def __init__(
         self,
@@ -29,17 +34,9 @@ class LeeSeungNMF:
         X: npt.NDArray[np.uint8],
     ):
         X = self.preprocess(X)
-        for n in tqdm(range(self.n_iterations)):
-            A = self.W.T @ X
-            B = self.W.T @ self.W @ self.H
-            for i in range(self.H.shape[0]):
-                for j in range(self.H.shape[1]):
-                    self.H[i][j] *= A[i][j] / B[i][j]
-            C = X @ self.H.T
-            D = self.W @ self.H @ self.H.T
-            for i in range(self.W.shape[0]):
-                for j in range(self.W.shape[1]):
-                    self.W[i][j] *= C[i][j] / D[i][j]
+        for _ in tqdm(range(self.n_iterations)):
+            self.H *= (self.W.T @ X) / (self.W.T @ self.W @ self.H)
+            self.W *= (X @ self.H.T) / (self.W @ self.H @ self.H.T)
         return self.W, self.H
 
 
