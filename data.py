@@ -70,7 +70,6 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
     images = np.array(images)
     images = images.reshape(-1, images.shape[1] * images.shape[2])
     labels = np.array(labels)
-
     return images, labels
 
 
