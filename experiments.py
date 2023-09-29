@@ -23,7 +23,7 @@ def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
 
 
 def all_experiments():
-    algorithms = [RobustNMF, LeeSeungNMF, RobustL1NMF]
+    algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF]
     noise_types = [None, "salt_and_pepper", "occlusion"]
     datasets = ["ORL", "CroppedYaleB"]
     data = []
