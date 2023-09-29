@@ -34,19 +34,20 @@ class LeeSeungNMF:
     def fit(
         self,
         X: npt.NDArray[np.uint8],
+        eps=1e-6,
     ):
         X = self.preprocess(X)
-        for _ in tqdm(range(self.n_iterations)):
-            self.H *= (self.W.T @ X) / (self.W.T @ self.W @ self.H)
-            self.W *= (X @ self.H.T) / (self.W @ self.H @ self.H.T)
+        for _ in range(self.n_iterations):
+            self.H *= (self.W.T @ X) / (self.W.T @ self.W @ self.H + eps)
+            self.W *= (X @ self.H.T) / (self.W @ self.H @ self.H.T + eps)
         return self.W, self.H
 
 
 if __name__ == "__main__":
-    images, labels = load_data(root="data/ORL", corruption_type=None)
+    images, labels = load_data(root="data/CroppedYaleB", corruption_type=None)
     K = 2
     alg = LeeSeungNMF(K)
     W, H = alg.fit(images)
     for i in range(K):
-        plt.imshow(H[i, :].reshape(28, 23))
+        plt.imshow(H[i, :].reshape(48, 42))
         plt.show()
