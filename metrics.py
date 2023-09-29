@@ -1,8 +1,6 @@
 import numpy as np
 from collections import Counter
 from sklearn.cluster import KMeans
-from data import load_data
-from nmf import LeeSeungNMF
 from dataclasses import dataclass
 from sklearn.metrics import (
     accuracy_score,
