@@ -3,6 +3,7 @@ from data import load_data
 from nmf import LeeSeungNMF
 import warnings
 import pandas as pd
+import argparse
 
 warnings.filterwarnings("ignore")
 
@@ -19,7 +20,7 @@ def run_experiment(dataset, method, noise_type):
     return metrics
 
 
-if __name__ == "__main__":
+def all_experiments():
     algorithms = [LeeSeungNMF]
     noise_types = [None, "salt_and_pepper", "occlusion"]
     datasets = ["ORL", "CroppedYaleB"]
@@ -45,6 +46,10 @@ if __name__ == "__main__":
                         metrics.accuracy,
                     ]
                 )
+    return data, index
+
+
+def get_results(data, index, save_csv=False):
     index = pd.MultiIndex.from_tuples(
         index,
         names=[
@@ -62,5 +67,20 @@ if __name__ == "__main__":
         ],
         index=index,
     )
+    if save_csv:
+        data.reset_index().to_csv("results.csv")
     print("\n")
     print(data)
+
+
+def main(save_results=False):
+    data, index = all_experiments()
+    get_results(data, index, save_csv=save_results)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save-csv", action="store_true")
+
+    args = parser.parse_args()
+    main(args.save_csv)
