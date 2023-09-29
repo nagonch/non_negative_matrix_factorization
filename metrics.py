@@ -7,6 +7,7 @@ from sklearn.metrics import (
     normalized_mutual_info_score,
     mean_squared_error,
 )
+import numpy.typing as npt
 
 
 @dataclass
@@ -16,7 +17,7 @@ class NMFMetrics:
     nmi: float
 
 
-def assign_cluster_label(X, Y):
+def assign_cluster_label(X: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
     kmeans = KMeans(n_clusters=len(set(Y))).fit(X)
     Y_pred = np.zeros(Y.shape)
     for i in set(kmeans.labels_):
@@ -25,7 +26,12 @@ def assign_cluster_label(X, Y):
     return Y_pred
 
 
-def get_metrics(X_original, D, R, Y):
+def get_metrics(
+    X_original: npt.NDArray[np.uint8],
+    D: npt.NDArray[np.float32],
+    R: npt.NDArray[np.float32],
+    Y: npt.NDArray[np.uint8],
+):
     X_reconstructed = D @ R
     rmse = mean_squared_error(
         X_original.reshape(-1), X_reconstructed.reshape(-1), squared=False

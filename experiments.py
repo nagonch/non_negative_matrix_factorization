@@ -3,12 +3,14 @@ from data import load_data
 from nmf import LeeSeungNMF, RobustNMF
 import warnings
 import pandas as pd
+import numpy as np
 import argparse
+import numpy.typing as npt
 
 warnings.filterwarnings("ignore")
 
 
-def run_experiment(dataset, method, noise_type):
+def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
     images, labels = load_data(
         root=f"data/{dataset}", corruption_type=noise_type
     )
@@ -30,7 +32,9 @@ def all_experiments():
         alg_name = alg.__name__
         for noise_type in noise_types:
             for dataset in datasets:
-                print(f"Evaluating {alg_name}, {dataset}, {noise_type}...")
+                print(
+                    f"Evaluating {alg_name}, {dataset}, {noise_type if not noise_type is None else 'no noise'}..."
+                )
                 metrics = run_experiment(dataset, alg, noise_type)
                 index.append(
                     [
@@ -49,7 +53,11 @@ def all_experiments():
     return data, index
 
 
-def get_results(data, index, save_csv=False):
+def get_results(
+    data: npt.NDArray[np.uint8],
+    index: npt.NDArray[np.uint8],
+    save_csv: bool = False,
+):
     index = pd.MultiIndex.from_tuples(
         index,
         names=[
@@ -73,7 +81,7 @@ def get_results(data, index, save_csv=False):
     print(data)
 
 
-def main(save_results=False):
+def main(save_results: bool = False):
     data, index = all_experiments()
     get_results(data, index, save_csv=save_results)
 
