@@ -28,7 +28,7 @@ class LeeSeungNMF:
         current_std = X.std()
         scaled_matrix = (X - current_mean) * (
             result_std / current_std
-        ) + result_mean
+        ) + result_mean  # descibed in "Methods" section of the paper
         return np.clip(scaled_matrix, 0, 1)
 
     def fit(
