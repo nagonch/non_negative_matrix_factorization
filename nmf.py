@@ -121,11 +121,53 @@ class RobustNMF(NMFBase):
         return self.W, self.H
 
 
+class RobustL1NMF(NMFBase):
+    def __init__(
+        self,
+        latent_space_size: int,
+        n_iterations: int = 500,
+        verbose: bool = True,
+        l1_ratio: float = 1.0,
+        alpha: float = 0.1,
+    ):
+        super().__init__(latent_space_size, n_iterations, verbose)
+        self.l1_ratio = l1_ratio
+        self.alpha = alpha
+
+    def fit(self, X):
+        X = self.preprocess(X)
+        self.E = np.zeros_like(X)
+        iterator = range(self.n_iterations)
+        if self.verbose:
+            iterator = tqdm(iterator)
+        for _ in iterator:
+            # Update H
+            WH = np.dot(self.W, self.H)
+            self.H *= (np.dot(self.W.T, X - self.E)) / (
+                np.dot(self.W.T, WH) + 1e-9
+            )
+
+            # Update W
+            WH = np.dot(self.W, self.H)
+            self.W *= (np.dot(X - self.E, self.H.T)) / (
+                np.dot(WH, self.H.T) + 1e-9
+            )
+
+            # Update E
+            WH = np.dot(self.W, self.H)
+            self.E = X - WH
+            self.E = np.sign(self.E) * np.maximum(
+                np.abs(self.E) - self.alpha * self.l1_ratio, 0
+            )
+
+        return self.W, self.H
+
+
 if __name__ == "__main__":
     pass
     # images, labels = load_data(root="data/CroppedYaleB", corruption_type=None)
     # K = 20
-    # alg = RobustNMF(K)
+    # alg = RobustL1NMF(K)
     # W, H = alg.fit(images)
     # for i in range(K):
     #     plt.imshow(
