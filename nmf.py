@@ -5,13 +5,7 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 
-class LeeSeungNMF:
-    """
-    Lee, D. D., & Seung, H. S. (1999)
-    Learning the parts of objects by non-negative matrix factorization
-    Nature, 401(6755), 788-791
-    """
-
+class NMFBase:
     def __init__(
         self,
         latent_space_size: int,
@@ -28,6 +22,11 @@ class LeeSeungNMF:
         result_mean: float = 0.25,
         result_std: float = 0.25,
     ):
+        """
+        A preprocessing step described in "Methods"
+        section of Lee Seung paper
+        """
+
         self.N, self.M = X.shape
         self.W = np.random.uniform(size=(self.N, self.K))
         self.H = np.random.uniform(size=(self.K, self.M))
@@ -35,8 +34,31 @@ class LeeSeungNMF:
         current_std = X.std()
         scaled_matrix = (X - current_mean) * (
             result_std / current_std
-        ) + result_mean  # descibed in "Methods" section of the paper
+        ) + result_mean
         return np.clip(scaled_matrix, 0, 1)
+
+    def fit(
+        self,
+        X: npt.NDArray[np.uint8],
+        eps: float = 1e-6,
+    ):
+        raise NotImplementedError()
+
+
+class LeeSeungNMF(NMFBase):
+    """
+    Lee, D. D., & Seung, H. S. (1999)
+    Learning the parts of objects by non-negative matrix factorization
+    Nature, 401(6755), 788-791
+    """
+
+    def __init__(
+        self,
+        latent_space_size: int,
+        n_iterations: int = 500,
+        verbose: bool = True,
+    ):
+        super().__init__(latent_space_size, n_iterations, verbose)
 
     def fit(
         self,
@@ -53,7 +75,7 @@ class LeeSeungNMF:
         return self.W, self.H
 
 
-class RobustNMF:
+class RobustNMF(NMFBase):
     """
     Zhang, Lijun, et al. "Robust non-negative matrix factorization."
     Frontiers of Electrical and Electronic Engineering in China 6 (2011): 192-200.
@@ -63,32 +85,14 @@ class RobustNMF:
         self,
         latent_space_size: int,
         n_iterations: int = 500,
-        lambda_reg: float = 0.7,
         verbose: bool = True,
+        lambda_reg: float = 0.7,
     ):
-        self.K = latent_space_size
-        self.n_iterations = n_iterations
+        super().__init__(latent_space_size, n_iterations, verbose)
         self.lambda_reg = lambda_reg
-        self.verbose = verbose
-
-    def preproces(
-        self,
-        X: npt.NDArray[np.uint8],
-        result_mean: float = 0.25,
-        result_std: float = 0.25,
-    ):
-        self.N, self.M = X.shape
-        self.W = np.random.uniform(size=(self.N, self.K))
-        self.H = np.random.uniform(size=(self.K, self.M))
-        current_mean = X.mean()
-        current_std = X.std()
-        scaled_matrix = (X - current_mean) * (
-            result_std / current_std
-        ) + result_mean  # descibed in "Methods" section of the paper
-        return np.clip(scaled_matrix, 0, 1)
 
     def fit(self, X: npt.NDArray[np.uint8], eps: float = 1e-6):
-        X = self.preproces(X)
+        X = self.preprocess(X)
         iterator = range(self.n_iterations)
         if self.verbose:
             iterator = tqdm(iterator)
@@ -118,16 +122,17 @@ class RobustNMF:
 
 
 if __name__ == "__main__":
-    images, labels = load_data(root="data/ORL", corruption_type=None)
-    K = 20
-    alg = RobustNMF(K, lambda_reg=0.7)
-    W, H = alg.fit(images)
-    for i in range(K):
-        plt.imshow(
-            H[i, :].reshape(28, 23),
-            # H[i, :].reshape(48, 42),
-            cmap="gray",
-            interpolation="bicubic",
-            aspect="auto",
-        )
-        plt.show()
+    pass
+    # images, labels = load_data(root="data/CroppedYaleB", corruption_type=None)
+    # K = 20
+    # alg = RobustNMF(K)
+    # W, H = alg.fit(images)
+    # for i in range(K):
+    #     plt.imshow(
+    #         # H[i, :].reshape(28, 23),
+    #         H[i, :].reshape(48, 42),
+    #         cmap="gray",
+    #         interpolation="bicubic",
+    #         aspect="auto",
+    #     )
+    #     plt.show()
