@@ -63,7 +63,7 @@ class LeeSeungNMF(NMFBase):
     def fit(
         self,
         X: npt.NDArray[np.uint8],
-        eps: float = 1e-6,
+        eps: float = 1e-9,
     ):
         X = self.preprocess(X)
         iterator = range(self.n_iterations)
@@ -91,7 +91,7 @@ class RobustNMF(NMFBase):
         super().__init__(latent_space_size, n_iterations, verbose)
         self.lambda_reg = lambda_reg
 
-    def fit(self, X: npt.NDArray[np.uint8], eps: float = 1e-6):
+    def fit(self, X: npt.NDArray[np.uint8], eps: float = 1e-9):
         X = self.preprocess(X)
         iterator = range(self.n_iterations)
         if self.verbose:
@@ -134,7 +134,7 @@ class RobustL1NMF(NMFBase):
         self.l1_ratio = l1_ratio
         self.alpha = alpha
 
-    def fit(self, X):
+    def fit(self, X: npt.NDArray[np.uint8], eps: float = 1e-9):
         X = self.preprocess(X)
         self.E = np.zeros_like(X)
         iterator = range(self.n_iterations)
@@ -144,13 +144,13 @@ class RobustL1NMF(NMFBase):
             # Update H
             WH = np.dot(self.W, self.H)
             self.H *= (np.dot(self.W.T, X - self.E)) / (
-                np.dot(self.W.T, WH) + 1e-9
+                np.dot(self.W.T, WH) + eps
             )
 
             # Update W
             WH = np.dot(self.W, self.H)
             self.W *= (np.dot(X - self.E, self.H.T)) / (
-                np.dot(WH, self.H.T) + 1e-9
+                np.dot(WH, self.H.T) + eps
             )
 
             # Update E
