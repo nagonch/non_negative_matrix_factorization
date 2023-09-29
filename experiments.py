@@ -1,6 +1,6 @@
 from metrics import get_metrics
 from data import load_data
-from nmf import LeeSeungNMF, RobustNMF
+from nmf import LeeSeungNMF, RobustNMF, RobustL1NMF
 import warnings
 import pandas as pd
 import numpy as np
@@ -23,7 +23,7 @@ def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
 
 
 def all_experiments():
-    algorithms = [RobustNMF, LeeSeungNMF]
+    algorithms = [RobustNMF, LeeSeungNMF, RobustL1NMF]
     noise_types = [None, "salt_and_pepper", "occlusion"]
     datasets = ["ORL", "CroppedYaleB"]
     data = []
