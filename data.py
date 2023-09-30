@@ -70,12 +70,10 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
     images = np.array(images)
     images = images.reshape(-1, images.shape[1] * images.shape[2])
     labels = np.array(labels)
-    return images, labels
+    return images.T, labels
 
 
 if __name__ == "__main__":
-    images, labels = load_data(
-        root="data/ORL", corruption_type="salt_and_pepper"
-    )
+    images, labels = load_data(root="data/ORL", corruption_type="salt_and_pepper")
 
     print(images.shape, labels.shape)

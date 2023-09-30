@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from sklearn.metrics import (
     accuracy_score,
     normalized_mutual_info_score,
-    mean_squared_error,
 )
 import numpy.typing as npt
 
@@ -18,7 +17,7 @@ class NMFMetrics:
 
 
 def assign_cluster_label(W: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
-    Y_pred = np.argmax(W, axis=1)
+    Y_pred = np.argmax(W, axis=0)
     for i in set(Y_pred):
         ind = Y_pred == i
         Y_pred[ind] = Counter(Y[ind]).most_common(1)[0][0]
@@ -34,7 +33,7 @@ def get_metrics(
 ):
     X_reconstructed = W @ H + S
     rmse = np.sqrt(np.mean((X_original - X_reconstructed) ** 2))
-    cluster_labels = assign_cluster_label(W, Y)
+    cluster_labels = assign_cluster_label(H, Y)
     acc = accuracy_score(Y, cluster_labels)
     nmi = normalized_mutual_info_score(Y, cluster_labels)
 
