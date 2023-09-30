@@ -11,13 +11,11 @@ warnings.filterwarnings("ignore")
 
 
 def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
-    images, labels = load_data(
-        root=f"data/{dataset}", corruption_type=noise_type
-    )
+    images, labels = load_data(root=f"data/{dataset}", corruption_type=noise_type)
     K = len(set(labels))
     nmf_method = method(K)
-    D, R = nmf_method.fit(images)
-    metrics = get_metrics(images, D, R, labels)
+    W, H, S = nmf_method.fit(images)
+    metrics = get_metrics(images, W, H, S, labels)
 
     return metrics
 
@@ -25,7 +23,9 @@ def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
 def all_experiments():
     algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF]
     noise_types = [None, "salt_and_pepper", "occlusion"]
-    datasets = ["ORL", "CroppedYaleB"]
+    datasets = [
+        "ORL",
+    ]  # "CroppedYaleB"]
     data = []
     index = []
     for alg in algorithms:

@@ -19,23 +19,11 @@ class NMFBase:
     def preprocess(
         self,
         X: npt.NDArray[np.uint8],
-        result_mean: float = 0.25,
-        result_std: float = 0.25,
     ):
-        """
-        A preprocessing step described in "Methods"
-        section of Lee Seung paper
-        """
-
         self.N, self.M = X.shape
         self.W = np.random.uniform(size=(self.N, self.K))
         self.H = np.random.uniform(size=(self.K, self.M))
-        current_mean = X.mean()
-        current_std = X.std()
-        scaled_matrix = (X - current_mean) * (
-            result_std / current_std
-        ) + result_mean
-        return np.clip(scaled_matrix, 0, 1)
+        return X
 
     def fit(
         self,
@@ -72,7 +60,7 @@ class LeeSeungNMF(NMFBase):
         for _ in iterator:
             self.H *= (self.W.T @ X) / (self.W.T @ self.W @ self.H + eps)
             self.W *= (X @ self.H.T) / (self.W @ self.H @ self.H.T + eps)
-        return self.W, self.H
+        return self.W, self.H, np.zeros_like(X)
 
 
 class RobustNMF(NMFBase):
@@ -112,13 +100,11 @@ class RobustNMF(NMFBase):
                 (np.abs(self.W.T @ (S - X)) - self.W.T @ (S - X))
                 / (2 * self.W.T @ self.W @ self.H + eps)
             ) * self.H
-            normalization = (
-                np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
-            )
+            normalization = np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
             self.W /= normalization
             self.H *= normalization.T
 
-        return self.W, self.H
+        return self.W, self.H, S
 
 
 class RobustL1NMF(NMFBase):
@@ -143,15 +129,11 @@ class RobustL1NMF(NMFBase):
         for _ in iterator:
             # Update H
             WH = np.dot(self.W, self.H)
-            self.H *= (np.dot(self.W.T, X - self.E)) / (
-                np.dot(self.W.T, WH) + eps
-            )
+            self.H *= (np.dot(self.W.T, X - self.E)) / (np.dot(self.W.T, WH) + eps)
 
             # Update W
             WH = np.dot(self.W, self.H)
-            self.W *= (np.dot(X - self.E, self.H.T)) / (
-                np.dot(WH, self.H.T) + eps
-            )
+            self.W *= (np.dot(X - self.E, self.H.T)) / (np.dot(WH, self.H.T) + eps)
 
             # Update E
             WH = np.dot(self.W, self.H)
@@ -160,15 +142,17 @@ class RobustL1NMF(NMFBase):
                 np.abs(self.E) - self.alpha * self.l1_ratio, 0
             )
 
-        return self.W, self.H
+        return self.W, self.H, self.E
 
 
 if __name__ == "__main__":
-    pass
-    # images, labels = load_data(root="data/CroppedYaleB", corruption_type=None)
-    # K = 20
-    # alg = RobustL1NMF(K)
-    # W, H = alg.fit(images)
+    # pass
+    images, labels = load_data(root="data/ORL", corruption_type=None)
+    K = 20
+    alg = RobustL1NMF(K)
+    W, H = alg.fit(images)
+    print(np.argmax(W, axis=1))
+    print(labels)
     # for i in range(K):
     #     plt.imshow(
     #         # H[i, :].reshape(28, 23),

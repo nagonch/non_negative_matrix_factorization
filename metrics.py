@@ -17,26 +17,24 @@ class NMFMetrics:
     nmi: float
 
 
-def assign_cluster_label(X: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
-    kmeans = KMeans(n_clusters=len(set(Y))).fit(X)
-    Y_pred = np.zeros(Y.shape)
-    for i in set(kmeans.labels_):
-        ind = kmeans.labels_ == i
+def assign_cluster_label(W: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
+    Y_pred = np.argmax(W, axis=1)
+    for i in set(Y_pred):
+        ind = Y_pred == i
         Y_pred[ind] = Counter(Y[ind]).most_common(1)[0][0]
     return Y_pred
 
 
 def get_metrics(
     X_original: npt.NDArray[np.uint8],
-    D: npt.NDArray[np.float32],
-    R: npt.NDArray[np.float32],
+    W: npt.NDArray[np.float32],
+    H: npt.NDArray[np.float32],
+    S: npt.NDArray[np.float32],
     Y: npt.NDArray[np.uint8],
 ):
-    X_reconstructed = D @ R
-    rmse = mean_squared_error(
-        X_original.reshape(-1), X_reconstructed.reshape(-1), squared=False
-    )
-    cluster_labels = assign_cluster_label(D, Y)
+    X_reconstructed = W @ H + S
+    rmse = np.sqrt(np.mean((X_original - X_reconstructed) ** 2))
+    cluster_labels = assign_cluster_label(W, Y)
     acc = accuracy_score(Y, cluster_labels)
     nmi = normalized_mutual_info_score(Y, cluster_labels)
 
