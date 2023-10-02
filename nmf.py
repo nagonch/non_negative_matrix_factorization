@@ -100,7 +100,9 @@ class RobustNMF(NMFBase):
                 (np.abs(self.W.T @ (S - X)) - self.W.T @ (S - X))
                 / (2 * self.W.T @ self.W @ self.H + eps)
             ) * self.H
-            normalization = np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
+            normalization = (
+                np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
+            )
             self.W /= normalization
             self.H *= normalization.T
 
@@ -129,11 +131,15 @@ class RobustL1NMF(NMFBase):
         for _ in iterator:
             # Update H
             WH = np.dot(self.W, self.H)
-            self.H *= (np.dot(self.W.T, X - self.E)) / (np.dot(self.W.T, WH) + eps)
+            self.H *= (np.dot(self.W.T, X - self.E)) / (
+                np.dot(self.W.T, WH) + eps
+            )
 
             # Update W
             WH = np.dot(self.W, self.H)
-            self.W *= (np.dot(X - self.E, self.H.T)) / (np.dot(WH, self.H.T) + eps)
+            self.W *= (np.dot(X - self.E, self.H.T)) / (
+                np.dot(WH, self.H.T) + eps
+            )
 
             # Update E
             WH = np.dot(self.W, self.H)
@@ -150,15 +156,13 @@ if __name__ == "__main__":
     images, labels = load_data(root="data/ORL", corruption_type=None)
     K = 20
     alg = RobustL1NMF(K)
-    W, H = alg.fit(images)
-    print(np.argmax(W, axis=1))
-    print(labels)
-    # for i in range(K):
-    #     plt.imshow(
-    #         # H[i, :].reshape(28, 23),
-    #         H[i, :].reshape(48, 42),
-    #         cmap="gray",
-    #         interpolation="bicubic",
-    #         aspect="auto",
-    #     )
-    #     plt.show()
+    W, H, E = alg.fit(images)
+    for i in range(K):
+        plt.imshow(
+            W.T[i, :].reshape(28, 23),
+            # W.T[i, :].reshape(48, 42),
+            cmap="gray",
+            interpolation="bicubic",
+            aspect="auto",
+        )
+        plt.show()
