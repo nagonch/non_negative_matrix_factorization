@@ -40,5 +40,18 @@ def get_metrics(
     return NMFMetrics(rmse, acc, nmi)
 
 
+def get_k_means_metrics(X_original: npt.NDArray[np.uint8], Y):
+    kmeans = KMeans(n_clusters=len(set(Y))).fit(X_original.T)
+    Y_pred = np.zeros(Y.shape)
+    for i in set(kmeans.labels_):
+        ind = kmeans.labels_ == i
+        Y_pred[ind] = Counter(Y[ind]).most_common(1)[0][0]
+
+    acc = accuracy_score(Y, Y_pred)
+    nmi = normalized_mutual_info_score(Y, Y_pred)
+
+    return NMFMetrics(1, acc, nmi)
+
+
 if __name__ == "__main__":
     pass

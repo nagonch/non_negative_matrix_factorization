@@ -1,4 +1,4 @@
-from metrics import get_metrics
+from metrics import get_metrics, get_k_means_metrics
 from data import load_data
 from nmf import LeeSeungNMF, RobustNMF, RobustL1NMF
 import warnings
@@ -11,25 +11,30 @@ warnings.filterwarnings("ignore")
 
 
 def run_experiment(dataset: npt.NDArray[np.uint8], method, noise_type: str):
-    images, labels = load_data(root=f"data/{dataset}", corruption_type=noise_type)
-    K = len(set(labels))
-    nmf_method = method(K)
-    W, H, S = nmf_method.fit(images)
-    metrics = get_metrics(images, W, H, S, labels)
+    images, labels = load_data(
+        root=f"data/{dataset}", corruption_type=noise_type
+    )
+    if method == "KMEANS":
+        metrics = get_k_means_metrics(images, labels)
+    else:
+        K = len(set(labels))
+        nmf_method = method(K)
+        W, H, S = nmf_method.fit(images)
+        metrics = get_metrics(images, W, H, S, labels)
 
     return metrics
 
 
 def all_experiments():
-    algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF]
+    algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF, "KMEANS"]
     noise_types = [None, "salt_and_pepper", "occlusion"]
     datasets = [
         "ORL",
-    ]  # "CroppedYaleB"]
+    ]  #  "CroppedYaleB"]
     data = []
     index = []
     for alg in algorithms:
-        alg_name = alg.__name__
+        alg_name = alg if type(alg) is str else alg.__name__
         for noise_type in noise_types:
             for dataset in datasets:
                 print(
