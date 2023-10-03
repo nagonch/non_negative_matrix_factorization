@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
 
 
 def add_occlusion_block(image_array, b=10):
@@ -9,12 +10,12 @@ def add_occlusion_block(image_array, b=10):
     result = np.copy(image_array)
     result[
         block_index_i : block_index_i + b, block_index_j : block_index_j + b
-    ] = 255 * np.ones((b, b))
+    ] = np.ones((b, b))
     return result
 
 
 def add_salt_and_pepper_noise(image_array, ratio=0.025):
-    for corrupted_value in [0, 255]:
+    for corrupted_value in [0, 1]:
         noise = np.random.uniform(
             low=0.0,
             high=1.0,
@@ -57,6 +58,7 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
 
             # convert image to numpy array.
             img = np.asarray(img)
+            img = (img - img.min()) / (img.max() - img.min() + 1e-9)
             if corruption_type == "occlusion":
                 img = add_occlusion_block(img)
             elif corruption_type == "salt_and_pepper":
@@ -70,13 +72,13 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
     images = np.array(images)
     images = images.reshape(-1, images.shape[1] * images.shape[2])
     labels = np.array(labels)
-    images = (images - images.min()) / (images.max() - images.min() + 1e-9)
     return images.T, labels
 
 
 if __name__ == "__main__":
     images, labels = load_data(
-        root="data/ORL", corruption_type="salt_and_pepper"
+        root="data/CroppedYaleB",
+        corruption_type="occlusion",
     )
 
     print(images.shape, labels.shape)
