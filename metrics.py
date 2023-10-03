@@ -17,9 +17,10 @@ class NMFMetrics:
 
 
 def assign_cluster_label(H: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
-    Y_pred = np.argmax(H, axis=0)
-    for i in set(Y_pred):
-        ind = Y_pred == i
+    kmeans = KMeans(n_clusters=len(set(Y))).fit(H.T)
+    Y_pred = np.zeros_like(Y)
+    for i in set(kmeans.labels_):
+        ind = kmeans.labels_ == i
         Y_pred[ind] = Counter(Y[ind]).most_common(1)[0][0]
     return Y_pred
 
