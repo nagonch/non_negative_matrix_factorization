@@ -100,9 +100,7 @@ class RobustNMF(NMFBase):
                 (np.abs(self.W.T @ (S - X)) - self.W.T @ (S - X))
                 / (2 * self.W.T @ self.W @ self.H + eps)
             ) * self.H
-            normalization = (
-                np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
-            )
+            normalization = np.sqrt(np.sum(self.W**2, axis=0, keepdims=True)) + eps
             self.W /= normalization
             self.H *= normalization.T
 
@@ -131,15 +129,11 @@ class RobustL1NMF(NMFBase):
         for _ in iterator:
             # Update H
             WH = np.dot(self.W, self.H)
-            self.H *= (np.dot(self.W.T, X - self.E)) / (
-                np.dot(self.W.T, WH) + eps
-            )
+            self.H *= (np.dot(self.W.T, X - self.E)) / (np.dot(self.W.T, WH) + eps)
 
             # Update W
             WH = np.dot(self.W, self.H)
-            self.W *= (np.dot(X - self.E, self.H.T)) / (
-                np.dot(WH, self.H.T) + eps
-            )
+            self.W *= (np.dot(X - self.E, self.H.T)) / (np.dot(WH, self.H.T) + eps)
 
             # Update E
             WH = np.dot(self.W, self.H)
@@ -153,7 +147,7 @@ class RobustL1NMF(NMFBase):
 
 if __name__ == "__main__":
     # pass
-    images, labels = load_data(root="data/ORL", corruption_type=None)
+    images, labels, _ = load_data(root="data/ORL", corruption_type=None)
     K = len(set(labels))
     alg = RobustNMF(K)
     W, H, E = alg.fit(images)

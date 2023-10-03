@@ -26,7 +26,7 @@ def assign_cluster_label(H: npt.NDArray[np.float32], Y: npt.NDArray[np.uint8]):
 
 
 def get_metrics(
-    X_original: npt.NDArray[np.uint8],
+    X_original: npt.NDArray[np.float32],
     W: npt.NDArray[np.float32],
     H: npt.NDArray[np.float32],
     S: npt.NDArray[np.float32],

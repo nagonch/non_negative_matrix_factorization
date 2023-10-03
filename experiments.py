@@ -17,7 +17,7 @@ def run_experiment(
     num_iterations=5,
     random_fraction=0.85,
 ):
-    images_data, labels_data = load_data(
+    images_data, labels_data, images_clean = load_data(
         root=f"data/{dataset}", corruption_type=noise_type
     )
     n_items = int(labels_data.shape[0] * random_fraction)
@@ -26,6 +26,7 @@ def run_experiment(
     for _ in range(num_iterations):
         np.random.shuffle(inds)
         images = images_data[:, inds][:, :n_items]
+        clean_images = images_clean[:, inds][:, :n_items]
         labels = labels_data[inds][:n_items]
         if method == "KMEANS":
             metrics = get_k_means_metrics(images, labels)
@@ -33,7 +34,7 @@ def run_experiment(
             K = len(set(labels))
             nmf_method = method(K)
             W, H, S = nmf_method.fit(images)
-            metrics = get_metrics(images, W, H, S, labels)
+            metrics = get_metrics(clean_images, W, H, S, labels)
         metrics_array.append(metrics)
 
     result_metrics = NMFMetrics(0, 0, 0)

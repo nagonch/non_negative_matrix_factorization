@@ -26,7 +26,7 @@ def add_salt_and_pepper_noise(image_array, ratio=0.025):
     return image_array
 
 
-def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
+def load_data(root="data/CroppedYaleB", reduce=1, corruption_type=None):
     """
     Load ORL (or Extended YaleB) dataset to numpy array.
 
@@ -35,7 +35,7 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
         reduce: scale factor for zooming out images.
 
     """
-    images, labels = [], []
+    images, labels, images_clean = [], [], []
 
     for i, person in enumerate(sorted(os.listdir(root))):
         if not os.path.isdir(os.path.join(root, person)):
@@ -59,20 +59,30 @@ def load_data(root="data/CroppedYaleB", reduce=4, corruption_type=None):
             # convert image to numpy array.
             img = np.asarray(img)
             img = (img - img.min()) / (img.max() - img.min() + 1e-9)
+            img_corrupted = img
             if corruption_type == "occlusion":
-                img = add_occlusion_block(img)
+                img_corrupted = add_occlusion_block(img)
             elif corruption_type == "salt_and_pepper":
-                img = add_salt_and_pepper_noise(img)
+                img_corrupted = add_salt_and_pepper_noise(img)
 
             # collect data and label.
-            images.append(img)
+            images_clean.append(img)
+            images.append(img_corrupted)
             labels.append(i)
 
     # concate all images and labels.
     images = np.array(images)
     images = images.reshape(-1, images.shape[1] * images.shape[2])
+    images_clean = np.array(images_clean)
+    images_clean = images_clean.reshape(
+        -1, images_clean.shape[1] * images_clean.shape[2]
+    )
     labels = np.array(labels)
-    return images.T, labels
+    return (
+        images.T,
+        labels,
+        images_clean.T,
+    )
 
 
 if __name__ == "__main__":
