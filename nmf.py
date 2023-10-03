@@ -154,15 +154,19 @@ class RobustL1NMF(NMFBase):
 if __name__ == "__main__":
     # pass
     images, labels = load_data(root="data/ORL", corruption_type=None)
-    K = 20
+    K = len(set(labels))
     alg = RobustNMF(K)
     W, H, E = alg.fit(images)
-    for i in range(K):
-        plt.imshow(
-            W.T[i, :].reshape(28, 23),
-            # W.T[i, :].reshape(48, 42),
-            cmap="gray",
-            interpolation="bicubic",
-            aspect="auto",
-        )
-        plt.show()
+    plt.imshow(H.T @ H)
+    plt.show()
+    # print(H.shape)
+    # print(np.argmax(H, axis=0))
+    # for i in range(K):
+    #     plt.imshow(
+    #         W.T[i, :].reshape(28, 23),
+    #         # W.T[i, :].reshape(48, 42),
+    #         cmap="gray",
+    #         interpolation="bicubic",
+    #         aspect="auto",
+    #     )
+    #     plt.show()
