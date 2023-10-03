@@ -1,6 +1,4 @@
-*.pgm
-*.info
-data
-LaTeX-template
+*.*
+!*.py
 venv
-.vscode
+data
