@@ -50,9 +50,7 @@ def all_experiments(
 ):
     algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF, "KMEANS"]
     noise_types = [None, "salt_and_pepper", "occlusion"]
-    datasets = [
-        "ORL",
-    ]  # "CroppedYaleB"]
+    datasets = ["ORL", "CroppedYaleB"]
     data = []
     index = []
     for alg in algorithms:
