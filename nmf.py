@@ -155,7 +155,7 @@ if __name__ == "__main__":
     # pass
     images, labels = load_data(root="data/ORL", corruption_type=None)
     K = 20
-    alg = RobustL1NMF(K)
+    alg = RobustNMF(K)
     W, H, E = alg.fit(images)
     for i in range(K):
         plt.imshow(
