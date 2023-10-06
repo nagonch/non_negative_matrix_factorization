@@ -16,9 +16,12 @@ def run_experiment(
     noise_type: str,
     num_iterations=5,
     random_fraction=0.85,
+    downsample: int = 5,
 ):
     images_data, labels_data, images_clean = load_data(
-        root=f"data/{dataset}", corruption_type=noise_type
+        root=f"data/{dataset}",
+        corruption_type=noise_type,
+        reduce=downsample,
     )
     n_items = int(labels_data.shape[0] * random_fraction)
     inds = np.arange(0, labels_data.shape[0], 1)
@@ -50,6 +53,7 @@ def run_experiment(
 def all_experiments(
     iterations_per_eval: int = 5,
     sampling_fraction: float = 0.85,
+    downsample: int = 5,
 ):
     algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF, "KMEANS"]
     noise_types = [None, "salt_and_pepper", "occlusion"]
@@ -69,6 +73,7 @@ def all_experiments(
                     noise_type,
                     iterations_per_eval,
                     sampling_fraction,
+                    downsample,
                 )
                 index.append(
                     [
@@ -119,8 +124,11 @@ def main(
     save_results: bool = False,
     iterations_per_eval: int = 5,
     sampling_fraction: float = 0.85,
+    downsample: int = 5,
 ):
-    data, index = all_experiments(iterations_per_eval, sampling_fraction)
+    data, index = all_experiments(
+        iterations_per_eval, sampling_fraction, downsample
+    )
     get_results(data, index, save_csv=save_results)
 
 
@@ -128,7 +136,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--save-csv", action="store_true")
     parser.add_argument("--iterations-per-eval", type=int, default=5)
+    parser.add_argument("--downsample", type=int, default=2)
     parser.add_argument("--sampling-fraction", type=float, default=0.85)
 
     args = parser.parse_args()
-    main(args.save_csv, args.iterations_per_eval, args.sampling_fraction)
+    main(
+        args.save_csv,
+        args.iterations_per_eval,
+        args.sampling_fraction,
+        args.downsample,
+    )
