@@ -40,7 +40,9 @@ def run_experiment(
     result_metrics = NMFMetrics(0, 0, 0)
     result_metrics.rmse = np.mean([metric.rmse for metric in metrics_array])
     result_metrics.nmi = np.mean([metric.nmi for metric in metrics_array])
-    result_metrics.accuracy = np.mean([metric.accuracy for metric in metrics_array])
+    result_metrics.accuracy = np.mean(
+        [metric.accuracy for metric in metrics_array]
+    )
 
     return result_metrics
 
@@ -51,7 +53,7 @@ def all_experiments(
 ):
     algorithms = [LeeSeungNMF, RobustNMF, RobustL1NMF, "KMEANS"]
     noise_types = [None, "salt_and_pepper", "occlusion"]
-    datasets = ["ORL", "CroppedYaleB"]
+    datasets = ["CroppedYaleB", "CroppedYaleB"]
     data = []
     index = []
     for alg in algorithms:
@@ -62,7 +64,11 @@ def all_experiments(
                     f"Evaluating {alg_name}, {dataset}, {noise_type if not noise_type is None else 'no noise'}..."
                 )
                 metrics = run_experiment(
-                    dataset, alg, noise_type, iterations_per_eval, sampling_fraction
+                    dataset,
+                    alg,
+                    noise_type,
+                    iterations_per_eval,
+                    sampling_fraction,
                 )
                 index.append(
                     [
