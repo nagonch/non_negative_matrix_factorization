@@ -1,4 +1,4 @@
-# ml_homework1
+# non_negative_matrix_factorization
 
 Install dependencies: `pip install -r requirements.txt`
 
